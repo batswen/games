@@ -10,3 +10,5 @@ main.js is the driver, chess.js and helper.js are the "backend"
 
 ### Bugs
 - promotion: always queen
+
+Maybe rewrite in the future
