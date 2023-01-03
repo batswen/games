@@ -1,0 +1,15 @@
+{
+  "name": "minesweeper",
+  "version": "1.0.0",
+  "description": "a minesweeper game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron main.js"
+  },
+  "author": "Swen Rühl",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^9.4.0"
+  }
+}

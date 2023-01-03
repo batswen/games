@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+
+<html lang="de">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<meta name="author" content="Swen Rühl">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/css.css">
+
+	<title>mineSweeper</title>
+	<script>
+        window.onload = function() {
+            new Game(10, 10, 20)
+        }
+        require("electron").ipcRenderer.on("io", (event, msg, fname) => {
+            switch (msg) {
+                case "neu":
+                console.log("restart")
+                    document.getElementById("page").innerHTML = ""
+                    new Game(10, 10, 20)
+                    break
+                case "info":
+                    document.getElementById("modalHeader").textContent = "Info"
+                    document.getElementById("modalP").textContent = "it's a game"
+                    document.getElementById("modalDiv").style.display = "block"
+                    break
+                case "reset":
+                    break
+            }
+        })
+	</script>
+</head>
+
+<body>
+    <div id="modalDiv" class="modal">
+        <div>
+            <h2 id="modalHeader"></h2>
+            <p id="modalP"></p>
+            <button onclick='document.getElementById("modalDiv").style.display="none"'>Ok</button>
+        </div>
+    </div>
+    <div id="page"></div>
+    <script src="js/game.js"></script>
+</body>
+</html>
