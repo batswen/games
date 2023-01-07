@@ -38,7 +38,7 @@ inventory.add(new Item({ index: 2, amount: 7 }))
 
 const mouse = Vector.zero()
 
-let mousebutton = MOUSE.UP, mouse_index: number = -1, mouse_delta: Vector = new Vector({ x: 0, y: 0 }), mouse_inventory: number = -1
+let mousebutton = MOUSE.UP
 // let current_tile = null
 
 function start() {
