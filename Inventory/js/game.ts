@@ -39,9 +39,8 @@ inventory.add(new Item({ index: 2, amount: 7 }))
 const mouse = Vector.zero()
 
 let mousebutton = MOUSE.UP
-// let current_tile = null
 
-function start() {
+function start(): void {
     canvas.addEventListener("mousemove", event => {
         const rect = canvas.getBoundingClientRect(); mouse.x = event.clientX - rect.left; mouse.y = event.clientY - rect.top
     })

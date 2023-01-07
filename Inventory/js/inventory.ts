@@ -48,9 +48,9 @@ export class Inventory {
     #tileset: HTMLImageElement
     #size: Vector
     #inventory: InventoryRect[]
-    #mouse_down_index: number
-    #mouse_position: Vector
-    #mouse_delta: Vector
+    #mouse_down_index: number   // contains inventory index
+    #mouse_position: Vector     // x,y
+    #mouse_delta: Vector        // x,y
     #tile_index: number | undefined
     constructor(ctx: CanvasRenderingContext2D, tileset: HTMLImageElement, size: Vector) {
         this.#ctx = ctx
@@ -130,12 +130,12 @@ export class Inventory {
                 if (this.test(hover_index)) {
                     this.#mouse_down_index = hover_index
                     this.#mouse_delta = this.pointInRectDelta(this.#mouse_position)
+                    this.#tile_index = this.get(this.#mouse_down_index)?.tileIndex()
                 }
             }
         }
     
         if (mousebutton === MOUSE.DOWN && this.#mouse_down_index !== -1) {
-            this.#tile_index = this.get(this.#mouse_down_index)?.tileIndex()
         }
     
         if (mousebutton === MOUSE.UP && this.#mouse_down_index !== -1) {
@@ -239,11 +239,6 @@ export class Inventory {
                 this.#ctx.fillText(text_line.text, xPos, yPos)
                 yPos += parseInt(text_line.font)
             }
-            // this.#ctx.font = "16px Pirata One"
-            // if (item.itemtype() === ITEMTYPE.WEAPON) {
-            //     this.#ctx.fillStyle = "#abf"
-            //     this.#ctx.fillText(`Damage: ${item.item().damage}`, x + 2 + 4, y + 22 + 4 + 40)
-            // }
         }
     }
 }

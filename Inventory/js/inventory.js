@@ -54,9 +54,9 @@ export class Inventory {
         _Inventory_tileset.set(this, void 0);
         _Inventory_size.set(this, void 0);
         _Inventory_inventory.set(this, void 0);
-        _Inventory_mouse_down_index.set(this, void 0);
-        _Inventory_mouse_position.set(this, void 0);
-        _Inventory_mouse_delta.set(this, void 0);
+        _Inventory_mouse_down_index.set(this, void 0); // contains inventory index
+        _Inventory_mouse_position.set(this, void 0); // x,y
+        _Inventory_mouse_delta.set(this, void 0); // x,y
         _Inventory_tile_index.set(this, void 0);
         __classPrivateFieldSet(this, _Inventory_ctx, ctx, "f");
         __classPrivateFieldSet(this, _Inventory_tileset, tileset, "f");
@@ -136,11 +136,11 @@ export class Inventory {
                 if (this.test(hover_index)) {
                     __classPrivateFieldSet(this, _Inventory_mouse_down_index, hover_index, "f");
                     __classPrivateFieldSet(this, _Inventory_mouse_delta, this.pointInRectDelta(__classPrivateFieldGet(this, _Inventory_mouse_position, "f")), "f");
+                    __classPrivateFieldSet(this, _Inventory_tile_index, (_a = this.get(__classPrivateFieldGet(this, _Inventory_mouse_down_index, "f"))) === null || _a === void 0 ? void 0 : _a.tileIndex(), "f");
                 }
             }
         }
         if (mousebutton === MOUSE.DOWN && __classPrivateFieldGet(this, _Inventory_mouse_down_index, "f") !== -1) {
-            __classPrivateFieldSet(this, _Inventory_tile_index, (_a = this.get(__classPrivateFieldGet(this, _Inventory_mouse_down_index, "f"))) === null || _a === void 0 ? void 0 : _a.tileIndex(), "f");
         }
         if (mousebutton === MOUSE.UP && __classPrivateFieldGet(this, _Inventory_mouse_down_index, "f") !== -1) {
             const new_index = this.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
@@ -226,11 +226,6 @@ export class Inventory {
                 __classPrivateFieldGet(this, _Inventory_ctx, "f").fillText(text_line.text, xPos, yPos);
                 yPos += parseInt(text_line.font);
             }
-            // this.#ctx.font = "16px Pirata One"
-            // if (item.itemtype() === ITEMTYPE.WEAPON) {
-            //     this.#ctx.fillStyle = "#abf"
-            //     this.#ctx.fillText(`Damage: ${item.item().damage}`, x + 2 + 4, y + 22 + 4 + 40)
-            // }
         }
     }
 }
