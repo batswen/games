@@ -33,7 +33,8 @@ inventory.addSlot(new Vector({ x: 10, y: 160 + 64 + 2 }), Itemtype.ANY, 9, 1)
 inventory.set(6, new Item({ index: 0, amount: 1 }))
 inventory.add(new Item({ index: 1, amount: 1 }))
 inventory.add(new Item({ index: 1, amount: 1 }))
-inventory.add(new Item({ index: 2, amount: 1 }))
+inventory.set(0, new Item({ index: 3, amount: 1 }))
+inventory.add(new Item({ index: 2, amount: 7 }))
 
 const mouse = Vector.zero()
 

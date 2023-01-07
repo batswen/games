@@ -196,11 +196,13 @@ export class Inventory {
             const item = this.get(inv_index);
             const x = __classPrivateFieldGet(this, _Inventory_mouse_position, "f").x, y = __classPrivateFieldGet(this, _Inventory_mouse_position, "f").y;
             const text = [
-                { font: "24px Pirata One", color: "#fff", text: item.item().name },
+                { font: "24px Pirata One", color: "#fff", text: "Qqg" + item.item().name },
                 { font: "16px Pirata One", color: "#4a4", text: item.itemtypeString() },
+                { font: "4", color: "", text: "" },
                 { font: "16px Pirata One", color: "#abf", text: `Damage: ${item.item().damage}` },
                 { font: "16px Pirata One", color: "#abf", text: `Protection: ${item.item().protection}` },
-                { font: "16px Pirata One", color: "#fab", text: `Weight: ${item.item().weight}` }
+                { font: "4", color: "", text: "" },
+                { font: "16px Pirata One", color: "#fab", text: `Weight: ${item.item().weight * item.amount()}` }
             ];
             let width = 0, height = 6;
             for (const text_line of text) {
@@ -211,11 +213,13 @@ export class Inventory {
                 }
                 height += parseInt(text_line.font);
             }
+            const info_y = y + 20;
+            const padding = 3;
             __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = "#000";
             __classPrivateFieldGet(this, _Inventory_ctx, "f").strokeStyle = "#fff";
-            __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(x, y, width, height);
-            __classPrivateFieldGet(this, _Inventory_ctx, "f").strokeRect(x, y, width, height);
-            let xPos = x, yPos = y + 20;
+            __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(x, info_y, width + padding * 2, height + padding * 2);
+            __classPrivateFieldGet(this, _Inventory_ctx, "f").strokeRect(x, info_y, width + padding * 2, height + padding * 2);
+            let xPos = x + padding, yPos = info_y + 20 + padding;
             for (const text_line of text) {
                 __classPrivateFieldGet(this, _Inventory_ctx, "f").font = text_line.font;
                 __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = text_line.color;

@@ -206,11 +206,13 @@ export class Inventory {
             const item = this.get(inv_index)!
             const x = this.#mouse_position.x, y = this.#mouse_position.y
             const text: Array<{ font: string, color: string, text: string }> = [
-                { font: "24px Pirata One", color: "#fff", text: item.item().name },
+                { font: "24px Pirata One", color: "#fff", text: "Qqg"+item.item().name },
                 { font: "16px Pirata One", color: "#4a4", text: item.itemtypeString() },
+                { font: "4", color: "", text: "" },
                 { font: "16px Pirata One", color: "#abf", text: `Damage: ${item.item().damage}` },
                 { font: "16px Pirata One", color: "#abf", text: `Protection: ${item.item().protection}` },
-                { font: "16px Pirata One", color: "#fab", text: `Weight: ${item.item().weight}` }
+                { font: "4", color: "", text: "" },
+                { font: "16px Pirata One", color: "#fab", text: `Weight: ${item.item().weight * item.amount()}` }
             ]
             let width = 0, height = 6
             for (const text_line of text) {
@@ -222,12 +224,15 @@ export class Inventory {
                 height += parseInt(text_line.font)
             }
 
+            const info_y = y + 20
+            const padding = 3
+
             this.#ctx.fillStyle = "#000"
             this.#ctx.strokeStyle = "#fff"
-            this.#ctx.fillRect(x, y, width, height)
-            this.#ctx.strokeRect(x, y, width, height)
+            this.#ctx.fillRect(x, info_y, width + padding * 2, height + padding * 2)
+            this.#ctx.strokeRect(x, info_y, width + padding * 2, height + padding * 2)
 
-            let xPos = x, yPos = y + 20
+            let xPos = x + padding, yPos = info_y + 20 + padding
             for (const text_line of text) {
                 this.#ctx.font = text_line.font
                 this.#ctx.fillStyle = text_line.color
