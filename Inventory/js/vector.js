@@ -40,17 +40,17 @@ export class Vector {
         return this;
     }
     normalize() {
-        this.mult(1 / this.getMagnitude());
+        this.mult(1 / this.magnitude());
         return this;
     }
-    getMagnitude() {
+    magnitude() {
         // return Math.sqrt(this.x * this.x + this.y * this.y)
         return Math.hypot(this.x, this.y);
     }
-    getDistance(arg) {
-        return arg.copy().sub(this).getMagnitude();
+    distance(arg) {
+        return arg.copy().sub(this).magnitude();
     }
-    getAngle() {
+    angle() {
         return Math.atan2(this.y, this.x) * 180 / Math.PI + 90;
     }
     copy() {
@@ -68,7 +68,7 @@ export class Vector {
     }
     toString() {
         // return "" + this.x + ", " + this.y
-        return `Vector({${this.x}, ${this.y}})`;
+        return `Vector({ x: ${this.x}, y: ${this.y}})`;
     }
 }
 //# sourceMappingURL=vector.js.map
