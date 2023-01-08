@@ -14,7 +14,7 @@ if (ctx === null) {
 const size = new Vector(32, 32);
 const start_y = 80, delta_y = 33, gap_y = 3;
 const start_x = 20, delta_x = 33;
-const inventory = new Inventory(ctx, size);
+const inventory = new Inventory(ctx, 4, size);
 inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y }), Itemtype.HELMET); // Head
 inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y }), Itemtype.WEAPON); // RArm
 inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y + delta_y }), Itemtype.PLATE); // Body
@@ -53,6 +53,11 @@ function start() {
 function render() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, 400, 400);
+    // Draw players
+    ctx.fillStyle = "grey";
+    for (let i = 0; i < 4; i++) {
+        ctx.fillRect(i * 64 + i * 8 + 8, 8, 66, 66);
+    }
     inventory.update(mousebutton, mouse);
     inventory.draw();
     requestAnimationFrame(render);

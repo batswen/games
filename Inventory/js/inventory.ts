@@ -57,7 +57,7 @@ export class Inventory {
     #mouse_position: Vector     // x,y
     #mouse_delta: Vector        // x,y
     #held_item: Item | null     // dragged item
-    constructor(ctx: CanvasRenderingContext2D, size: Vector) {
+    constructor(ctx: CanvasRenderingContext2D, players: number, size: Vector) {
         this.#ctx = ctx
         this.#size = size
         this.#inventory = []
@@ -169,12 +169,6 @@ export class Inventory {
         }
     }
     draw() {
-        // Draw other players
-        this.#ctx.fillStyle = "grey"
-        for (let i = 0; i < 4; i++) {
-            this.#ctx.fillRect(i * 64 + i * 8 + 50, 10, 66, 66)
-        }
-
         // Draw all inventory slots and items
         for (let index = 0; index < this.#inventory.length; index++) {
 

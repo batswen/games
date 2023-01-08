@@ -25,7 +25,7 @@ const ITEMS = [
     { src: "sword_red.png", number_images: 1, itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 5 },
     { src: "sword_blue.png", number_images: 1, itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 3.5 },
     { src: "book_blue.png", number_images: 1, itemtype: Itemtype.MISC, name: "Blue book", weight: 0.5 },
-    { src: "helmet_monty.png", number_images: 1, itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 4 },
+    { src: "helmet_monty.png", number_images: 1, itemtype: Itemtype.HELMET, name: "Helmet", protection: 5, weight: 4 },
     { src: "spark_anim_6.png", number_images: 6, itemtype: Itemtype.MISC, name: "Sparkling spark", weight: 0 }
 ];
 export class Item {

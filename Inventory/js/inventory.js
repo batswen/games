@@ -55,7 +55,7 @@ class InventoryRect {
 }
 _InventoryRect_ctx = new WeakMap(), _InventoryRect_position = new WeakMap(), _InventoryRect_size = new WeakMap(), _InventoryRect_item = new WeakMap(), _InventoryRect_itemtype = new WeakMap();
 export class Inventory {
-    constructor(ctx, size) {
+    constructor(ctx, players, size) {
         _Inventory_ctx.set(this, void 0);
         _Inventory_size.set(this, void 0);
         _Inventory_inventory.set(this, void 0);
@@ -177,11 +177,6 @@ export class Inventory {
         }
     }
     draw() {
-        // Draw other players
-        __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = "grey";
-        for (let i = 0; i < 4; i++) {
-            __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(i * 64 + i * 8 + 50, 10, 66, 66);
-        }
         // Draw all inventory slots and items
         for (let index = 0; index < __classPrivateFieldGet(this, _Inventory_inventory, "f").length; index++) {
             const rect = __classPrivateFieldGet(this, _Inventory_inventory, "f")[index];
