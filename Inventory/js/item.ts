@@ -3,11 +3,11 @@ export enum Itemtype {
     HELMET, PLATE, LEGGINS, BOOTS, WEAPON
 }
 
-const ITEMS: Array<{ tile_index: number, itemtype: Itemtype, name: string, damage?: string, protection?: string, weight: number }> = [
-    { tile_index: 10 + 25 * 64, itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 15 },
-    { tile_index: 9 + 25 * 64, itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 13 },
-    { tile_index: 3 + 22 * 64, itemtype: Itemtype.MISC, name: "Blue book", weight: 2 },
-    { tile_index: 8 + 21 * 64, itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 10 }
+const ITEMS: Array<{ tile: string, itemtype: Itemtype, name: string, damage?: string, protection?: string, weight: number }> = [
+    { tile: "sword_red.png", itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 15 },
+    { tile: "sword_blue.png", itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 13 },
+    { tile: "book_blue.png", itemtype: Itemtype.MISC, name: "Blue book", weight: 2 },
+    { tile: "helmet_monty.png", itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 10 }
 ]
 interface IItem {
     index: number
@@ -15,17 +15,18 @@ interface IItem {
 }
 export class Item {
     #index: number
-    #tile_index: number
+    #tile: HTMLImageElement
     #itemtype: Itemtype
     #amount: number
     constructor({ index, amount }: IItem) {
         this.#index = index
-        this.#tile_index = ITEMS[this.#index].tile_index
+        this.#tile = new Image()
+        this.#tile.src = `${location.pathname}img/${ITEMS[this.#index].tile}`
         this.#itemtype = ITEMS[this.#index].itemtype
         this.#amount = amount
     }
     item() { return ITEMS[this.#index] }
-    tileIndex() { return this.#tile_index }
+    tile() { return this.#tile }
     itemtype() { return this.#itemtype }
     itemtypeString() {
         switch (this.#itemtype) {

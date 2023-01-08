@@ -2,9 +2,8 @@ import { Vector } from "./vector.js"
 import { Inventory } from "./inventory.js"
 import { Item, Itemtype } from "./item.js"
 
-export const MOUSE = {
-    DOWN: "DOWN",
-    UP: "UP"
+export enum Mouse {
+    DOWN, UP
 }
 
 const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement
@@ -17,18 +16,20 @@ tileset.src = location.pathname + "img/tileset.png"
 // tileset.src = "../img/tileset.png"
 
 const size = new Vector({ x: 32, y: 32 })
+const start_y = 50, delta_y = 33, gap_y = 3
+const start_x = 20, delta_x = 33
 
 const inventory = new Inventory(ctx, tileset, size)
-inventory.addSlot(new Vector({ x: 43, y: 17 }), Itemtype.HELMET) // Head
-inventory.addSlot(new Vector({ x: 10, y: 50 }), Itemtype.WEAPON) // RArm
-inventory.addSlot(new Vector({ x: 43, y: 50 }), Itemtype.PLATE) // Body
-inventory.addSlot(new Vector({ x: 76, y: 50 }), Itemtype.WEAPON) // LArm
-inventory.addSlot(new Vector({ x: 43, y: 50 + 32 + 1 }), Itemtype.LEGGINS) // Legs
-inventory.addSlot(new Vector({ x: 43, y: 50 + 64 + 2 }), Itemtype.BOOTS) // Boots
+inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y }), Itemtype.HELMET) // Head
+inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y }), Itemtype.WEAPON) // RArm
+inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y + delta_y }), Itemtype.PLATE) // Body
+inventory.addSlot(new Vector({ x: start_x + delta_x * 2, y: start_y + delta_y }), Itemtype.WEAPON) // LArm
+inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y + delta_y * 2 }), Itemtype.LEGGINS) // Legs
+inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y + delta_y * 3 }), Itemtype.BOOTS) // Boots
 // First line
-inventory.addSlot(new Vector({ x: 10, y: 160 }), Itemtype.ANY, 9, 1)
-inventory.addSlot(new Vector({ x: 10, y: 160 + 32 + 1 }), Itemtype.ANY, 9, 1)
-inventory.addSlot(new Vector({ x: 10, y: 160 + 64 + 2 }), Itemtype.ANY, 9, 1)
+inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y * 4 + gap_y }), Itemtype.ANY, 9, 1)
+inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y * 5 + gap_y }), Itemtype.ANY, 9, 1)
+inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y * 6 + gap_y }), Itemtype.ANY, 9, 1)
 
 inventory.set(6, new Item({ index: 0, amount: 1 }))
 inventory.add(new Item({ index: 1, amount: 1 }))
@@ -38,7 +39,7 @@ inventory.add(new Item({ index: 2, amount: 7 }))
 
 const mouse = Vector.zero()
 
-let mousebutton = MOUSE.UP
+let mousebutton: Mouse = Mouse.UP
 
 function start(): void {
     canvas.addEventListener("mousemove", event => {
@@ -46,12 +47,12 @@ function start(): void {
     })
     canvas.addEventListener("mousedown", event => {
         if (event.button === 0) {
-            mousebutton = MOUSE.DOWN
+            mousebutton = Mouse.DOWN
         }
     })
     canvas.addEventListener("mouseup", event => {
         if (event.button === 0) {
-            mousebutton = MOUSE.UP
+            mousebutton = Mouse.UP
         }
     })
     requestAnimationFrame(render)

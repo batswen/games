@@ -9,7 +9,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Item_index, _Item_tile_index, _Item_itemtype, _Item_amount;
+var _Item_index, _Item_tile, _Item_itemtype, _Item_amount;
 export var Itemtype;
 (function (Itemtype) {
     Itemtype[Itemtype["UNKNOWN"] = 0] = "UNKNOWN";
@@ -22,24 +22,25 @@ export var Itemtype;
     Itemtype[Itemtype["WEAPON"] = 7] = "WEAPON";
 })(Itemtype || (Itemtype = {}));
 const ITEMS = [
-    { tile_index: 10 + 25 * 64, itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 15 },
-    { tile_index: 9 + 25 * 64, itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 13 },
-    { tile_index: 3 + 22 * 64, itemtype: Itemtype.MISC, name: "Blue book", weight: 2 },
-    { tile_index: 8 + 21 * 64, itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 10 }
+    { tile: "sword_red.png", itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 15 },
+    { tile: "sword_blue.png", itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 13 },
+    { tile: "book_blue.png", itemtype: Itemtype.MISC, name: "Blue book", weight: 2 },
+    { tile: "helmet_monty.png", itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 10 }
 ];
 export class Item {
     constructor({ index, amount }) {
         _Item_index.set(this, void 0);
-        _Item_tile_index.set(this, void 0);
+        _Item_tile.set(this, void 0);
         _Item_itemtype.set(this, void 0);
         _Item_amount.set(this, void 0);
         __classPrivateFieldSet(this, _Item_index, index, "f");
-        __classPrivateFieldSet(this, _Item_tile_index, ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].tile_index, "f");
+        __classPrivateFieldSet(this, _Item_tile, new Image(), "f");
+        __classPrivateFieldGet(this, _Item_tile, "f").src = `${location.pathname}img/${ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].tile}`;
         __classPrivateFieldSet(this, _Item_itemtype, ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].itemtype, "f");
         __classPrivateFieldSet(this, _Item_amount, amount, "f");
     }
     item() { return ITEMS[__classPrivateFieldGet(this, _Item_index, "f")]; }
-    tileIndex() { return __classPrivateFieldGet(this, _Item_tile_index, "f"); }
+    tile() { return __classPrivateFieldGet(this, _Item_tile, "f"); }
     itemtype() { return __classPrivateFieldGet(this, _Item_itemtype, "f"); }
     itemtypeString() {
         switch (__classPrivateFieldGet(this, _Item_itemtype, "f")) {
@@ -60,5 +61,5 @@ export class Item {
     }
     amount() { return __classPrivateFieldGet(this, _Item_amount, "f"); }
 }
-_Item_index = new WeakMap(), _Item_tile_index = new WeakMap(), _Item_itemtype = new WeakMap(), _Item_amount = new WeakMap();
+_Item_index = new WeakMap(), _Item_tile = new WeakMap(), _Item_itemtype = new WeakMap(), _Item_amount = new WeakMap();
 //# sourceMappingURL=item.js.map

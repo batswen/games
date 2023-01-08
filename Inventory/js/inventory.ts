@@ -1,4 +1,4 @@
-import { MOUSE } from "./game.js"
+import { Mouse } from "./game.js"
 import { Vector } from "./vector.js"
 import { Itemtype, Item } from "./item.js"
 
@@ -62,12 +62,6 @@ export class Inventory {
         this.#mouse_position = new Vector({ x: 0, y: 0 })
         this.#mouse_delta = new Vector({ x: 0, y: 0 })
     }
-    test(index: number): boolean {
-        if (index >= this.#inventory.length) {
-            throw new Error("test(index)")
-        }
-        return this.#inventory[index].getItem() !== null
-    }
     empty(index: number): boolean {
         return this.#inventory[index].getItem() === null
     }
@@ -122,12 +116,12 @@ export class Inventory {
         }
         return result
     }
-    update(mousebutton: string, mouse: Vector) {
+    update(mousebutton: Mouse, mouse: Vector) {
         this.#mouse_position = mouse
-        if (mousebutton === MOUSE.DOWN && this.#held_item === null) {
+        if (mousebutton === Mouse.DOWN && this.#held_item === null) {
             const hover_index = this.pointInRect(this.#mouse_position)
             if (hover_index > -1) {
-                if (this.test(hover_index)) {
+                if (!this.empty(hover_index)) {
                     this.#mouse_down_index = hover_index
                     this.#mouse_delta = this.pointInRectDelta(this.#mouse_position)
                     this.#held_item = this.#inventory[this.#mouse_down_index].getItem()
@@ -136,12 +130,12 @@ export class Inventory {
             }
         }
     
-        if (mousebutton === MOUSE.UP && this.#held_item !== null) {
+        if (mousebutton === Mouse.UP && this.#held_item !== null) {
             const new_index = this.pointInRect(this.#mouse_position)
             if (new_index > -1) {
                 if (this.canDrop(new_index, this.#held_item.itemtype())) {
                     if (this.empty(new_index)) {
-                        this.set(new_index, this.#held_item)
+                        this.set(new_index, this.#held_item) // If slot empty
                     } else {
                         const item_to_swap = this.get(new_index)
                         if (item_to_swap !== null && this.canDrop(this.#mouse_down_index, item_to_swap.itemtype())) {
@@ -151,6 +145,8 @@ export class Inventory {
                             this.set(this.#mouse_down_index, this.#held_item)
                         }
                     }
+                } else {
+                    this.set(this.#mouse_down_index, this.#held_item)
                 }
             }
             this.#mouse_down_index = -1
@@ -166,9 +162,9 @@ export class Inventory {
             const item = rect.getItem()
             if (item !== null && index !== this.#mouse_down_index) {
                 this.#ctx.drawImage(
-                    this.#tileset,
-                    Math.floor(item.tileIndex() % 64) * rect.size().x,
-                    Math.floor(item.tileIndex() / 64) * rect.size().y,
+                    item.tile(),
+                    0,
+                    0,
                     rect.size().x, rect.size().y,
                     rect.position().x, rect.position().y,
                     rect.size().x, rect.size().y
@@ -185,9 +181,9 @@ export class Inventory {
         // Draw dragged item
         if (this.#held_item !== null) {
             this.#ctx.drawImage(
-                this.#tileset,
-                Math.floor(this.#held_item.tileIndex() % 64) * this.#size.x,
-                Math.floor(this.#held_item.tileIndex() / 64) * this.#size.y,
+                this.#held_item.tile(),
+                0,
+                0,
                 this.#size.x, this.#size.y,
                 this.#mouse_position.x - this.#mouse_delta.x,
                 // this.#mouse_position.x - this.#mouse_delta.x,
@@ -227,7 +223,7 @@ export class Inventory {
             this.#ctx.fillRect(x, info_y, width + padding * 2, height + padding * 2)
             this.#ctx.strokeRect(x, info_y, width + padding * 2, height + padding * 2)
 
-            let xPos = x + padding, yPos = info_y + 20 + padding
+            let xPos = x + padding, yPos = info_y + 18 + padding
             for (const text_line of text) {
                 this.#ctx.font = text_line.font
                 this.#ctx.fillStyle = text_line.color

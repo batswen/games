@@ -10,7 +10,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _InventoryRect_position, _InventoryRect_size, _InventoryRect_content, _InventoryRect_itemtype, _Inventory_ctx, _Inventory_tileset, _Inventory_size, _Inventory_inventory, _Inventory_mouse_down_index, _Inventory_mouse_position, _Inventory_mouse_delta, _Inventory_held_item;
-import { MOUSE } from "./game.js";
+import { Mouse } from "./game.js";
 import { Vector } from "./vector.js";
 import { Itemtype } from "./item.js";
 class InventoryRect {
@@ -66,12 +66,6 @@ export class Inventory {
         __classPrivateFieldSet(this, _Inventory_held_item, null, "f");
         __classPrivateFieldSet(this, _Inventory_mouse_position, new Vector({ x: 0, y: 0 }), "f");
         __classPrivateFieldSet(this, _Inventory_mouse_delta, new Vector({ x: 0, y: 0 }), "f");
-    }
-    test(index) {
-        if (index >= __classPrivateFieldGet(this, _Inventory_inventory, "f").length) {
-            throw new Error("test(index)");
-        }
-        return __classPrivateFieldGet(this, _Inventory_inventory, "f")[index].getItem() !== null;
     }
     empty(index) {
         return __classPrivateFieldGet(this, _Inventory_inventory, "f")[index].getItem() === null;
@@ -129,10 +123,10 @@ export class Inventory {
     }
     update(mousebutton, mouse) {
         __classPrivateFieldSet(this, _Inventory_mouse_position, mouse, "f");
-        if (mousebutton === MOUSE.DOWN && __classPrivateFieldGet(this, _Inventory_held_item, "f") === null) {
+        if (mousebutton === Mouse.DOWN && __classPrivateFieldGet(this, _Inventory_held_item, "f") === null) {
             const hover_index = this.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
             if (hover_index > -1) {
-                if (this.test(hover_index)) {
+                if (!this.empty(hover_index)) {
                     __classPrivateFieldSet(this, _Inventory_mouse_down_index, hover_index, "f");
                     __classPrivateFieldSet(this, _Inventory_mouse_delta, this.pointInRectDelta(__classPrivateFieldGet(this, _Inventory_mouse_position, "f")), "f");
                     __classPrivateFieldSet(this, _Inventory_held_item, __classPrivateFieldGet(this, _Inventory_inventory, "f")[__classPrivateFieldGet(this, _Inventory_mouse_down_index, "f")].getItem(), "f");
@@ -140,12 +134,12 @@ export class Inventory {
                 }
             }
         }
-        if (mousebutton === MOUSE.UP && __classPrivateFieldGet(this, _Inventory_held_item, "f") !== null) {
+        if (mousebutton === Mouse.UP && __classPrivateFieldGet(this, _Inventory_held_item, "f") !== null) {
             const new_index = this.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
             if (new_index > -1) {
                 if (this.canDrop(new_index, __classPrivateFieldGet(this, _Inventory_held_item, "f").itemtype())) {
                     if (this.empty(new_index)) {
-                        this.set(new_index, __classPrivateFieldGet(this, _Inventory_held_item, "f"));
+                        this.set(new_index, __classPrivateFieldGet(this, _Inventory_held_item, "f")); // If slot empty
                     }
                     else {
                         const item_to_swap = this.get(new_index);
@@ -157,6 +151,9 @@ export class Inventory {
                             this.set(__classPrivateFieldGet(this, _Inventory_mouse_down_index, "f"), __classPrivateFieldGet(this, _Inventory_held_item, "f"));
                         }
                     }
+                }
+                else {
+                    this.set(__classPrivateFieldGet(this, _Inventory_mouse_down_index, "f"), __classPrivateFieldGet(this, _Inventory_held_item, "f"));
                 }
             }
             __classPrivateFieldSet(this, _Inventory_mouse_down_index, -1, "f");
@@ -171,7 +168,7 @@ export class Inventory {
             __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(rect.position().x, rect.position().y, __classPrivateFieldGet(this, _Inventory_size, "f").x, __classPrivateFieldGet(this, _Inventory_size, "f").y);
             const item = rect.getItem();
             if (item !== null && index !== __classPrivateFieldGet(this, _Inventory_mouse_down_index, "f")) {
-                __classPrivateFieldGet(this, _Inventory_ctx, "f").drawImage(__classPrivateFieldGet(this, _Inventory_tileset, "f"), Math.floor(item.tileIndex() % 64) * rect.size().x, Math.floor(item.tileIndex() / 64) * rect.size().y, rect.size().x, rect.size().y, rect.position().x, rect.position().y, rect.size().x, rect.size().y);
+                __classPrivateFieldGet(this, _Inventory_ctx, "f").drawImage(item.tile(), 0, 0, rect.size().x, rect.size().y, rect.position().x, rect.position().y, rect.size().x, rect.size().y);
                 if (item.amount() > 1) {
                     __classPrivateFieldGet(this, _Inventory_ctx, "f").font = "9px Arial";
                     __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = "#000";
@@ -183,7 +180,7 @@ export class Inventory {
         }
         // Draw dragged item
         if (__classPrivateFieldGet(this, _Inventory_held_item, "f") !== null) {
-            __classPrivateFieldGet(this, _Inventory_ctx, "f").drawImage(__classPrivateFieldGet(this, _Inventory_tileset, "f"), Math.floor(__classPrivateFieldGet(this, _Inventory_held_item, "f").tileIndex() % 64) * __classPrivateFieldGet(this, _Inventory_size, "f").x, Math.floor(__classPrivateFieldGet(this, _Inventory_held_item, "f").tileIndex() / 64) * __classPrivateFieldGet(this, _Inventory_size, "f").y, __classPrivateFieldGet(this, _Inventory_size, "f").x, __classPrivateFieldGet(this, _Inventory_size, "f").y, __classPrivateFieldGet(this, _Inventory_mouse_position, "f").x - __classPrivateFieldGet(this, _Inventory_mouse_delta, "f").x, 
+            __classPrivateFieldGet(this, _Inventory_ctx, "f").drawImage(__classPrivateFieldGet(this, _Inventory_held_item, "f").tile(), 0, 0, __classPrivateFieldGet(this, _Inventory_size, "f").x, __classPrivateFieldGet(this, _Inventory_size, "f").y, __classPrivateFieldGet(this, _Inventory_mouse_position, "f").x - __classPrivateFieldGet(this, _Inventory_mouse_delta, "f").x, 
             // this.#mouse_position.x - this.#mouse_delta.x,
             __classPrivateFieldGet(this, _Inventory_mouse_position, "f").y - __classPrivateFieldGet(this, _Inventory_mouse_delta, "f").y, __classPrivateFieldGet(this, _Inventory_size, "f").x, __classPrivateFieldGet(this, _Inventory_size, "f").y);
         }
@@ -216,7 +213,7 @@ export class Inventory {
             __classPrivateFieldGet(this, _Inventory_ctx, "f").strokeStyle = "#fff";
             __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(x, info_y, width + padding * 2, height + padding * 2);
             __classPrivateFieldGet(this, _Inventory_ctx, "f").strokeRect(x, info_y, width + padding * 2, height + padding * 2);
-            let xPos = x + padding, yPos = info_y + 20 + padding;
+            let xPos = x + padding, yPos = info_y + 18 + padding;
             for (const text_line of text) {
                 __classPrivateFieldGet(this, _Inventory_ctx, "f").font = text_line.font;
                 __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = text_line.color;
