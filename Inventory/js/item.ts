@@ -69,7 +69,7 @@ export class Item {
     draw(position: Vector) {
         if (this.#number_images > 1) {
             if (this.#anim_time + 250 < Date.now()) {
-                this.#anim_time += 250
+                this.#anim_time = Date.now()
                 this.#anim_frame = (this.#anim_frame + 1) % this.#number_images
             }
             this.#ctx.drawImage(

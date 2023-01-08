@@ -72,7 +72,7 @@ export class Item {
     draw(position) {
         if (__classPrivateFieldGet(this, _Item_number_images, "f") > 1) {
             if (__classPrivateFieldGet(this, _Item_anim_time, "f") + 250 < Date.now()) {
-                __classPrivateFieldSet(this, _Item_anim_time, __classPrivateFieldGet(this, _Item_anim_time, "f") + 250, "f");
+                __classPrivateFieldSet(this, _Item_anim_time, Date.now(), "f");
                 __classPrivateFieldSet(this, _Item_anim_frame, (__classPrivateFieldGet(this, _Item_anim_frame, "f") + 1) % __classPrivateFieldGet(this, _Item_number_images, "f"), "f");
             }
             __classPrivateFieldGet(this, _Item_ctx, "f").drawImage(this.tile(), __classPrivateFieldGet(this, _Item_anim_frame, "f") * 32, 0, 32, 32, position.x, position.y, 32, 32);
