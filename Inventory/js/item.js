@@ -9,7 +9,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Item_ctx, _Item_index, _Item_tile, _Item_itemtype, _Item_amount;
+var _Item_ctx, _Item_index, _Item_tile, _Item_itemtype, _Item_amount, _Item_anim_time, _Item_anim_frame, _Item_number_images;
 export var Itemtype;
 (function (Itemtype) {
     Itemtype[Itemtype["UNKNOWN"] = 0] = "UNKNOWN";
@@ -22,10 +22,11 @@ export var Itemtype;
     Itemtype[Itemtype["WEAPON"] = 7] = "WEAPON";
 })(Itemtype || (Itemtype = {}));
 const ITEMS = [
-    { tile: "sword_red.png", itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 15 },
-    { tile: "sword_blue.png", itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 13 },
-    { tile: "book_blue.png", itemtype: Itemtype.MISC, name: "Blue book", weight: 2 },
-    { tile: "helmet_monty.png", itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 10 }
+    { src: "sword_red.png", number_images: 1, itemtype: Itemtype.WEAPON, name: "Sword", damage: "1-6", weight: 5 },
+    { src: "sword_blue.png", number_images: 1, itemtype: Itemtype.WEAPON, name: "Sword of bladiness", damage: "2-7", weight: 3.5 },
+    { src: "book_blue.png", number_images: 1, itemtype: Itemtype.MISC, name: "Blue book", weight: 0.5 },
+    { src: "helmet_monty.png", number_images: 1, itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 4 },
+    { src: "spark_anim_6.png", number_images: 6, itemtype: Itemtype.MISC, name: "Sparkling spark", weight: 0 }
 ];
 export class Item {
     constructor(ctx, { index, amount }) {
@@ -34,12 +35,18 @@ export class Item {
         _Item_tile.set(this, void 0);
         _Item_itemtype.set(this, void 0);
         _Item_amount.set(this, void 0);
+        _Item_anim_time.set(this, void 0);
+        _Item_anim_frame.set(this, void 0);
+        _Item_number_images.set(this, void 0);
         __classPrivateFieldSet(this, _Item_ctx, ctx, "f");
         __classPrivateFieldSet(this, _Item_index, index, "f");
         __classPrivateFieldSet(this, _Item_tile, new Image(), "f");
-        __classPrivateFieldGet(this, _Item_tile, "f").src = `${location.pathname}img/${ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].tile}`;
+        __classPrivateFieldGet(this, _Item_tile, "f").src = `${location.pathname}img/${ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].src}`;
         __classPrivateFieldSet(this, _Item_itemtype, ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].itemtype, "f");
         __classPrivateFieldSet(this, _Item_amount, amount, "f");
+        __classPrivateFieldSet(this, _Item_anim_time, Date.now(), "f");
+        __classPrivateFieldSet(this, _Item_anim_frame, 0, "f");
+        __classPrivateFieldSet(this, _Item_number_images, this.item().number_images, "f");
     }
     item() { return ITEMS[__classPrivateFieldGet(this, _Item_index, "f")]; }
     tile() { return __classPrivateFieldGet(this, _Item_tile, "f"); }
@@ -63,7 +70,16 @@ export class Item {
     }
     amount() { return __classPrivateFieldGet(this, _Item_amount, "f"); }
     draw(position) {
-        __classPrivateFieldGet(this, _Item_ctx, "f").drawImage(this.tile(), position.x, position.y);
+        if (__classPrivateFieldGet(this, _Item_number_images, "f") > 1) {
+            if (__classPrivateFieldGet(this, _Item_anim_time, "f") + 250 < Date.now()) {
+                __classPrivateFieldSet(this, _Item_anim_time, __classPrivateFieldGet(this, _Item_anim_time, "f") + 250, "f");
+                __classPrivateFieldSet(this, _Item_anim_frame, (__classPrivateFieldGet(this, _Item_anim_frame, "f") + 1) % __classPrivateFieldGet(this, _Item_number_images, "f"), "f");
+            }
+            __classPrivateFieldGet(this, _Item_ctx, "f").drawImage(this.tile(), __classPrivateFieldGet(this, _Item_anim_frame, "f") * 32, 0, 32, 32, position.x, position.y, 32, 32);
+        }
+        else {
+            __classPrivateFieldGet(this, _Item_ctx, "f").drawImage(this.tile(), position.x, position.y);
+        }
         if (this.amount() > 1) {
             __classPrivateFieldGet(this, _Item_ctx, "f").font = "9px Arial";
             __classPrivateFieldGet(this, _Item_ctx, "f").fillStyle = "#000";
@@ -73,5 +89,5 @@ export class Item {
         }
     }
 }
-_Item_ctx = new WeakMap(), _Item_index = new WeakMap(), _Item_tile = new WeakMap(), _Item_itemtype = new WeakMap(), _Item_amount = new WeakMap();
+_Item_ctx = new WeakMap(), _Item_index = new WeakMap(), _Item_tile = new WeakMap(), _Item_itemtype = new WeakMap(), _Item_amount = new WeakMap(), _Item_anim_time = new WeakMap(), _Item_anim_frame = new WeakMap(), _Item_number_images = new WeakMap();
 //# sourceMappingURL=item.js.map

@@ -15,5 +15,6 @@
     /* cursor: none; */
     margin: 1em;
     border: 1px solid black;
+    scale: 1;
 }
 #preview {border: 1px solid green;}

@@ -1,4 +1,4 @@
-import { Mouse } from "./game.js"
+import { Mousebutton } from "./game.js"
 import { Vector } from "./vector.js"
 import { Itemtype, Item } from "./item.js"
 
@@ -9,21 +9,23 @@ interface IInventoryRect {
 }
 
 class InventoryRect {
+    #ctx: CanvasRenderingContext2D
     #position: Vector
     #size: Vector
-    #content: Item | null
+    #item: Item | null
     #itemtype: Itemtype
-    constructor({ position, size, itemtype }: IInventoryRect) {
+    constructor(ctx: CanvasRenderingContext2D, { position, size, itemtype }: IInventoryRect) {
+        this.#ctx = ctx
         this.#position = position
         this.#size = size
         this.#itemtype = itemtype
-        this.#content = null
+        this.#item = null
     }
     setItem(item: Item | null) {
-        this.#content = item
+        this.#item = item
     }
     getItem() {
-        return this.#content
+        return this.#item
     }
     itemtype() {
         return this.#itemtype
@@ -41,6 +43,10 @@ class InventoryRect {
     pointInRectDelta(point: Vector): Vector {
         return new Vector({ x: point.x - this.#position.x, y: point.y - this.#position.y })
     }
+    draw(mouse_position: Vector) {
+        this.#ctx.fillStyle = `hsl(0, 0%, ${this.pointInRect(mouse_position) ? 50 : 60}%)`
+        this.#ctx.fillRect(this.position().x, this.position().y, this.#size.x, this.#size.y)
+    }
 }
 
 export class Inventory {
@@ -57,8 +63,8 @@ export class Inventory {
         this.#inventory = []
         this.#held_item_index = -1
         this.#held_item = null
-        this.#mouse_position = new Vector({ x: 0, y: 0 })
-        this.#mouse_delta = new Vector({ x: 0, y: 0 })
+        this.#mouse_position = Vector.zero()
+        this.#mouse_delta = Vector.zero()
     }
     empty(index: number): boolean {
         return this.#inventory[index].getItem() === null
@@ -71,8 +77,8 @@ export class Inventory {
     }
     addSlot(position: Vector, itemtype: Itemtype, numEntries: number = 1, gap: number = 1): void {
         for (let i = 0; i < numEntries; i++) {
-            this.#inventory.push(new InventoryRect({
-                    position: new Vector({ x: position.x + i * this.#size.x + gap * i, y: position.y }),
+            this.#inventory.push(new InventoryRect(this.#ctx, {
+                    position: new Vector(position.x + i * this.#size.x + gap * i, position.y),
                     size: this.#size,
                     itemtype
             }))
@@ -114,9 +120,9 @@ export class Inventory {
         }
         return result
     }
-    update(mousebutton: Mouse, mouse: Vector) {
+    update(mousebutton: Mousebutton, mouse: Vector) {
         this.#mouse_position = mouse
-        if (mousebutton === Mouse.DOWN && this.#held_item === null) {
+        if (mousebutton === Mousebutton.DOWN && this.#held_item === null) {
             const hover_index = this.pointInRect(this.#mouse_position)
             if (hover_index > -1) {
                 if (!this.empty(hover_index)) {
@@ -128,7 +134,8 @@ export class Inventory {
             }
         }
     
-        if (mousebutton === Mouse.UP && this.#held_item !== null) {
+        if (mousebutton === Mousebutton.UP && this.#held_item !== null) {
+            // Move inside
             const new_index = this.pointInRect(this.#mouse_position)
             if (new_index > -1) {
                 if (this.canDrop(new_index, this.#held_item.itemtype())) { // Can #held_item fit here
@@ -147,19 +154,35 @@ export class Inventory {
                 } else {
                     this.set(this.#held_item_index, this.#held_item)
                 }
+            } else {
+                this.set(this.#held_item_index, this.#held_item)
+            }
+            // Move to other player
+            let other_hover = null
+            if (other_hover !== null) {
+                if (!this.add(this.#held_item)) { // Change !this to !other_hover
+                    this.set(this.#held_item_index, this.#held_item)
+                }
             }
             this.#held_item_index = -1
             this.#held_item = null
         }
     }
     draw() {
+        // Draw other players
+        this.#ctx.fillStyle = "grey"
+        for (let i = 0; i < 4; i++) {
+            this.#ctx.fillRect(i * 64 + i * 8 + 50, 10, 66, 66)
+        }
+
         // Draw all inventory slots and items
         for (let index = 0; index < this.#inventory.length; index++) {
+
             const rect = this.#inventory[index]
-            this.#ctx.fillStyle = `hsl(0, 0%, ${rect.pointInRect(this.#mouse_position) ? 50 : 60}%)`
-            this.#ctx.fillRect(rect.position().x, rect.position().y, this.#size.x, this.#size.y)
+            rect.draw(this.#mouse_position)
+
             const item = rect.getItem()
-            if (item !== null && index !== this.#held_item_index) {
+            if (item !== null) {
                 item.draw(rect.position())
             }
         }
@@ -169,11 +192,14 @@ export class Inventory {
         }
         // Draw infobox
         const inv_index = this.pointInRect(this.#mouse_position)
+        const x = this.#mouse_position.x, y = this.#mouse_position.y
+        const padding = 3
+        const info_y = y + 20
         if (inv_index > -1 && !this.empty(inv_index)) {
             const item = this.get(inv_index)!
-            const x = this.#mouse_position.x, y = this.#mouse_position.y
             const text: Array<{ font: string, color: string, text: string }> = [
                 { font: "24px Pirata One", color: "#fff", text: item.item().name },
+                { font: "-8", color: "", text: "" },
                 { font: "16px Pirata One", color: "#4a4", text: item.itemtypeString() },
                 { font: "4", color: "", text: "" },
                 { font: "16px Pirata One", color: "#abf", text: `Damage: ${item.item().damage}` },
@@ -191,9 +217,6 @@ export class Inventory {
                 height += parseInt(text_line.font)
             }
 
-            const info_y = y + 20
-            const padding = 3
-
             this.#ctx.fillStyle = "#000"
             this.#ctx.strokeStyle = "#fff"
             this.#ctx.fillRect(x, info_y, width + padding * 2, height + padding * 2)
@@ -207,5 +230,16 @@ export class Inventory {
                 yPos += parseInt(text_line.font)
             }
         }
+        // draw weight
+        let weight = 0
+        for (const rect of this.#inventory) {
+            const item = rect.getItem()
+            if (item !== null) {
+                weight += item.amount() * item.item().weight
+            }
+        }
+        this.#ctx.font = "12px Courier"
+        this.#ctx.fillStyle = "black"
+        this.#ctx.fillText(`Weight: ${weight}kg of ${100}kg`, 20, 320)
     }
 }

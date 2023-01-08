@@ -9,26 +9,28 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _InventoryRect_position, _InventoryRect_size, _InventoryRect_content, _InventoryRect_itemtype, _Inventory_ctx, _Inventory_size, _Inventory_inventory, _Inventory_held_item_index, _Inventory_mouse_position, _Inventory_mouse_delta, _Inventory_held_item;
-import { Mouse } from "./game.js";
+var _InventoryRect_ctx, _InventoryRect_position, _InventoryRect_size, _InventoryRect_item, _InventoryRect_itemtype, _Inventory_ctx, _Inventory_size, _Inventory_inventory, _Inventory_held_item_index, _Inventory_mouse_position, _Inventory_mouse_delta, _Inventory_held_item;
+import { Mousebutton } from "./game.js";
 import { Vector } from "./vector.js";
 import { Itemtype } from "./item.js";
 class InventoryRect {
-    constructor({ position, size, itemtype }) {
+    constructor(ctx, { position, size, itemtype }) {
+        _InventoryRect_ctx.set(this, void 0);
         _InventoryRect_position.set(this, void 0);
         _InventoryRect_size.set(this, void 0);
-        _InventoryRect_content.set(this, void 0);
+        _InventoryRect_item.set(this, void 0);
         _InventoryRect_itemtype.set(this, void 0);
+        __classPrivateFieldSet(this, _InventoryRect_ctx, ctx, "f");
         __classPrivateFieldSet(this, _InventoryRect_position, position, "f");
         __classPrivateFieldSet(this, _InventoryRect_size, size, "f");
         __classPrivateFieldSet(this, _InventoryRect_itemtype, itemtype, "f");
-        __classPrivateFieldSet(this, _InventoryRect_content, null, "f");
+        __classPrivateFieldSet(this, _InventoryRect_item, null, "f");
     }
     setItem(item) {
-        __classPrivateFieldSet(this, _InventoryRect_content, item, "f");
+        __classPrivateFieldSet(this, _InventoryRect_item, item, "f");
     }
     getItem() {
-        return __classPrivateFieldGet(this, _InventoryRect_content, "f");
+        return __classPrivateFieldGet(this, _InventoryRect_item, "f");
     }
     itemtype() {
         return __classPrivateFieldGet(this, _InventoryRect_itemtype, "f");
@@ -46,8 +48,12 @@ class InventoryRect {
     pointInRectDelta(point) {
         return new Vector({ x: point.x - __classPrivateFieldGet(this, _InventoryRect_position, "f").x, y: point.y - __classPrivateFieldGet(this, _InventoryRect_position, "f").y });
     }
+    draw(mouse_position) {
+        __classPrivateFieldGet(this, _InventoryRect_ctx, "f").fillStyle = `hsl(0, 0%, ${this.pointInRect(mouse_position) ? 50 : 60}%)`;
+        __classPrivateFieldGet(this, _InventoryRect_ctx, "f").fillRect(this.position().x, this.position().y, __classPrivateFieldGet(this, _InventoryRect_size, "f").x, __classPrivateFieldGet(this, _InventoryRect_size, "f").y);
+    }
 }
-_InventoryRect_position = new WeakMap(), _InventoryRect_size = new WeakMap(), _InventoryRect_content = new WeakMap(), _InventoryRect_itemtype = new WeakMap();
+_InventoryRect_ctx = new WeakMap(), _InventoryRect_position = new WeakMap(), _InventoryRect_size = new WeakMap(), _InventoryRect_item = new WeakMap(), _InventoryRect_itemtype = new WeakMap();
 export class Inventory {
     constructor(ctx, size) {
         _Inventory_ctx.set(this, void 0);
@@ -62,8 +68,8 @@ export class Inventory {
         __classPrivateFieldSet(this, _Inventory_inventory, [], "f");
         __classPrivateFieldSet(this, _Inventory_held_item_index, -1, "f");
         __classPrivateFieldSet(this, _Inventory_held_item, null, "f");
-        __classPrivateFieldSet(this, _Inventory_mouse_position, new Vector({ x: 0, y: 0 }), "f");
-        __classPrivateFieldSet(this, _Inventory_mouse_delta, new Vector({ x: 0, y: 0 }), "f");
+        __classPrivateFieldSet(this, _Inventory_mouse_position, Vector.zero(), "f");
+        __classPrivateFieldSet(this, _Inventory_mouse_delta, Vector.zero(), "f");
     }
     empty(index) {
         return __classPrivateFieldGet(this, _Inventory_inventory, "f")[index].getItem() === null;
@@ -76,8 +82,8 @@ export class Inventory {
     }
     addSlot(position, itemtype, numEntries = 1, gap = 1) {
         for (let i = 0; i < numEntries; i++) {
-            __classPrivateFieldGet(this, _Inventory_inventory, "f").push(new InventoryRect({
-                position: new Vector({ x: position.x + i * __classPrivateFieldGet(this, _Inventory_size, "f").x + gap * i, y: position.y }),
+            __classPrivateFieldGet(this, _Inventory_inventory, "f").push(new InventoryRect(__classPrivateFieldGet(this, _Inventory_ctx, "f"), {
+                position: new Vector(position.x + i * __classPrivateFieldGet(this, _Inventory_size, "f").x + gap * i, position.y),
                 size: __classPrivateFieldGet(this, _Inventory_size, "f"),
                 itemtype
             }));
@@ -121,7 +127,7 @@ export class Inventory {
     }
     update(mousebutton, mouse) {
         __classPrivateFieldSet(this, _Inventory_mouse_position, mouse, "f");
-        if (mousebutton === Mouse.DOWN && __classPrivateFieldGet(this, _Inventory_held_item, "f") === null) {
+        if (mousebutton === Mousebutton.DOWN && __classPrivateFieldGet(this, _Inventory_held_item, "f") === null) {
             const hover_index = this.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
             if (hover_index > -1) {
                 if (!this.empty(hover_index)) {
@@ -132,7 +138,8 @@ export class Inventory {
                 }
             }
         }
-        if (mousebutton === Mouse.UP && __classPrivateFieldGet(this, _Inventory_held_item, "f") !== null) {
+        if (mousebutton === Mousebutton.UP && __classPrivateFieldGet(this, _Inventory_held_item, "f") !== null) {
+            // Move inside
             const new_index = this.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
             if (new_index > -1) {
                 if (this.canDrop(new_index, __classPrivateFieldGet(this, _Inventory_held_item, "f").itemtype())) { // Can #held_item fit here
@@ -155,18 +162,32 @@ export class Inventory {
                     this.set(__classPrivateFieldGet(this, _Inventory_held_item_index, "f"), __classPrivateFieldGet(this, _Inventory_held_item, "f"));
                 }
             }
+            else {
+                this.set(__classPrivateFieldGet(this, _Inventory_held_item_index, "f"), __classPrivateFieldGet(this, _Inventory_held_item, "f"));
+            }
+            // Move to other player
+            let other_hover = null;
+            if (other_hover !== null) {
+                if (!this.add(__classPrivateFieldGet(this, _Inventory_held_item, "f"))) { // Change !this to !other_hover
+                    this.set(__classPrivateFieldGet(this, _Inventory_held_item_index, "f"), __classPrivateFieldGet(this, _Inventory_held_item, "f"));
+                }
+            }
             __classPrivateFieldSet(this, _Inventory_held_item_index, -1, "f");
             __classPrivateFieldSet(this, _Inventory_held_item, null, "f");
         }
     }
     draw() {
+        // Draw other players
+        __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = "grey";
+        for (let i = 0; i < 4; i++) {
+            __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(i * 64 + i * 8 + 50, 10, 66, 66);
+        }
         // Draw all inventory slots and items
         for (let index = 0; index < __classPrivateFieldGet(this, _Inventory_inventory, "f").length; index++) {
             const rect = __classPrivateFieldGet(this, _Inventory_inventory, "f")[index];
-            __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = `hsl(0, 0%, ${rect.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f")) ? 50 : 60}%)`;
-            __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(rect.position().x, rect.position().y, __classPrivateFieldGet(this, _Inventory_size, "f").x, __classPrivateFieldGet(this, _Inventory_size, "f").y);
+            rect.draw(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
             const item = rect.getItem();
-            if (item !== null && index !== __classPrivateFieldGet(this, _Inventory_held_item_index, "f")) {
+            if (item !== null) {
                 item.draw(rect.position());
             }
         }
@@ -176,11 +197,14 @@ export class Inventory {
         }
         // Draw infobox
         const inv_index = this.pointInRect(__classPrivateFieldGet(this, _Inventory_mouse_position, "f"));
+        const x = __classPrivateFieldGet(this, _Inventory_mouse_position, "f").x, y = __classPrivateFieldGet(this, _Inventory_mouse_position, "f").y;
+        const padding = 3;
+        const info_y = y + 20;
         if (inv_index > -1 && !this.empty(inv_index)) {
             const item = this.get(inv_index);
-            const x = __classPrivateFieldGet(this, _Inventory_mouse_position, "f").x, y = __classPrivateFieldGet(this, _Inventory_mouse_position, "f").y;
             const text = [
                 { font: "24px Pirata One", color: "#fff", text: item.item().name },
+                { font: "-8", color: "", text: "" },
                 { font: "16px Pirata One", color: "#4a4", text: item.itemtypeString() },
                 { font: "4", color: "", text: "" },
                 { font: "16px Pirata One", color: "#abf", text: `Damage: ${item.item().damage}` },
@@ -197,8 +221,6 @@ export class Inventory {
                 }
                 height += parseInt(text_line.font);
             }
-            const info_y = y + 20;
-            const padding = 3;
             __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = "#000";
             __classPrivateFieldGet(this, _Inventory_ctx, "f").strokeStyle = "#fff";
             __classPrivateFieldGet(this, _Inventory_ctx, "f").fillRect(x, info_y, width + padding * 2, height + padding * 2);
@@ -211,6 +233,17 @@ export class Inventory {
                 yPos += parseInt(text_line.font);
             }
         }
+        // draw weight
+        let weight = 0;
+        for (const rect of __classPrivateFieldGet(this, _Inventory_inventory, "f")) {
+            const item = rect.getItem();
+            if (item !== null) {
+                weight += item.amount() * item.item().weight;
+            }
+        }
+        __classPrivateFieldGet(this, _Inventory_ctx, "f").font = "12px Courier";
+        __classPrivateFieldGet(this, _Inventory_ctx, "f").fillStyle = "black";
+        __classPrivateFieldGet(this, _Inventory_ctx, "f").fillText(`Weight: ${weight}kg of ${100}kg`, 20, 320);
     }
 }
 _Inventory_ctx = new WeakMap(), _Inventory_size = new WeakMap(), _Inventory_inventory = new WeakMap(), _Inventory_held_item_index = new WeakMap(), _Inventory_mouse_position = new WeakMap(), _Inventory_mouse_delta = new WeakMap(), _Inventory_held_item = new WeakMap();
