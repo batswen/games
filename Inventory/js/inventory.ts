@@ -45,19 +45,17 @@ class InventoryRect {
 
 export class Inventory {
     #ctx: CanvasRenderingContext2D
-    #tileset: HTMLImageElement
     #size: Vector
     #inventory: InventoryRect[]
-    #mouse_down_index: number   // contains inventory index
+    #held_item_index: number    // contains inventory index of #held_item
     #mouse_position: Vector     // x,y
     #mouse_delta: Vector        // x,y
-    #held_item: Item | null
-    constructor(ctx: CanvasRenderingContext2D, tileset: HTMLImageElement, size: Vector) {
+    #held_item: Item | null     // dragged item
+    constructor(ctx: CanvasRenderingContext2D, size: Vector) {
         this.#ctx = ctx
-        this.#tileset = tileset
         this.#size = size
         this.#inventory = []
-        this.#mouse_down_index = -1
+        this.#held_item_index = -1
         this.#held_item = null
         this.#mouse_position = new Vector({ x: 0, y: 0 })
         this.#mouse_delta = new Vector({ x: 0, y: 0 })
@@ -122,10 +120,10 @@ export class Inventory {
             const hover_index = this.pointInRect(this.#mouse_position)
             if (hover_index > -1) {
                 if (!this.empty(hover_index)) {
-                    this.#mouse_down_index = hover_index
+                    this.#held_item_index = hover_index
                     this.#mouse_delta = this.pointInRectDelta(this.#mouse_position)
-                    this.#held_item = this.#inventory[this.#mouse_down_index].getItem()
-                    this.set(this.#mouse_down_index, null)
+                    this.#held_item = this.#inventory[this.#held_item_index].getItem()
+                    this.set(this.#held_item_index, null)
                 }
             }
         }
@@ -133,23 +131,24 @@ export class Inventory {
         if (mousebutton === Mouse.UP && this.#held_item !== null) {
             const new_index = this.pointInRect(this.#mouse_position)
             if (new_index > -1) {
-                if (this.canDrop(new_index, this.#held_item.itemtype())) {
+                if (this.canDrop(new_index, this.#held_item.itemtype())) { // Can #held_item fit here
                     if (this.empty(new_index)) {
                         this.set(new_index, this.#held_item) // If slot empty
                     } else {
                         const item_to_swap = this.get(new_index)
-                        if (item_to_swap !== null && this.canDrop(this.#mouse_down_index, item_to_swap.itemtype())) {
+                        if (item_to_swap !== null &&
+                            this.canDrop(this.#held_item_index, item_to_swap.itemtype())) { // Can item under the mouse pointer fit in #held_item's slot
                             this.set(new_index, this.#held_item)
-                            this.set(this.#mouse_down_index, item_to_swap)
+                            this.set(this.#held_item_index, item_to_swap)
                         } else {
-                            this.set(this.#mouse_down_index, this.#held_item)
+                            this.set(this.#held_item_index, this.#held_item)
                         }
                     }
                 } else {
-                    this.set(this.#mouse_down_index, this.#held_item)
+                    this.set(this.#held_item_index, this.#held_item)
                 }
             }
-            this.#mouse_down_index = -1
+            this.#held_item_index = -1
             this.#held_item = null
         }
     }
@@ -160,36 +159,13 @@ export class Inventory {
             this.#ctx.fillStyle = `hsl(0, 0%, ${rect.pointInRect(this.#mouse_position) ? 50 : 60}%)`
             this.#ctx.fillRect(rect.position().x, rect.position().y, this.#size.x, this.#size.y)
             const item = rect.getItem()
-            if (item !== null && index !== this.#mouse_down_index) {
-                this.#ctx.drawImage(
-                    item.tile(),
-                    0,
-                    0,
-                    rect.size().x, rect.size().y,
-                    rect.position().x, rect.position().y,
-                    rect.size().x, rect.size().y
-                )
-                if (item.amount() > 1) {
-                    this.#ctx.font = "9px Arial"
-                    this.#ctx.fillStyle = "#000"
-                    this.#ctx.fillRect(rect.position().x + rect.size().x - 8, rect.position().y + rect.size().y - 9, 8, 9)
-                    this.#ctx.fillStyle = "#fff"
-                    this.#ctx.fillText("" + item.amount(), rect.position().x + rect.size().x - 7, rect.position().y + rect.size().y - 1)
-                }
+            if (item !== null && index !== this.#held_item_index) {
+                item.draw(rect.position())
             }
         }
         // Draw dragged item
         if (this.#held_item !== null) {
-            this.#ctx.drawImage(
-                this.#held_item.tile(),
-                0,
-                0,
-                this.#size.x, this.#size.y,
-                this.#mouse_position.x - this.#mouse_delta.x,
-                // this.#mouse_position.x - this.#mouse_delta.x,
-                this.#mouse_position.y - this.#mouse_delta.y,
-                this.#size.x, this.#size.y
-            )
+            this.#held_item.draw(this.#mouse_position.copy().sub(this.#mouse_delta))
         }
         // Draw infobox
         const inv_index = this.pointInRect(this.#mouse_position)

@@ -9,7 +9,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Item_index, _Item_tile, _Item_itemtype, _Item_amount;
+var _Item_ctx, _Item_index, _Item_tile, _Item_itemtype, _Item_amount;
 export var Itemtype;
 (function (Itemtype) {
     Itemtype[Itemtype["UNKNOWN"] = 0] = "UNKNOWN";
@@ -28,11 +28,13 @@ const ITEMS = [
     { tile: "helmet_monty.png", itemtype: Itemtype.HELMET, name: "Helmet", protection: "5", weight: 10 }
 ];
 export class Item {
-    constructor({ index, amount }) {
+    constructor(ctx, { index, amount }) {
+        _Item_ctx.set(this, void 0);
         _Item_index.set(this, void 0);
         _Item_tile.set(this, void 0);
         _Item_itemtype.set(this, void 0);
         _Item_amount.set(this, void 0);
+        __classPrivateFieldSet(this, _Item_ctx, ctx, "f");
         __classPrivateFieldSet(this, _Item_index, index, "f");
         __classPrivateFieldSet(this, _Item_tile, new Image(), "f");
         __classPrivateFieldGet(this, _Item_tile, "f").src = `${location.pathname}img/${ITEMS[__classPrivateFieldGet(this, _Item_index, "f")].tile}`;
@@ -60,6 +62,16 @@ export class Item {
         }
     }
     amount() { return __classPrivateFieldGet(this, _Item_amount, "f"); }
+    draw(position) {
+        __classPrivateFieldGet(this, _Item_ctx, "f").drawImage(this.tile(), position.x, position.y);
+        if (this.amount() > 1) {
+            __classPrivateFieldGet(this, _Item_ctx, "f").font = "9px Arial";
+            __classPrivateFieldGet(this, _Item_ctx, "f").fillStyle = "#000";
+            __classPrivateFieldGet(this, _Item_ctx, "f").fillRect(position.x + 32 - 8, position.y + 32 - 9, 8, 9);
+            __classPrivateFieldGet(this, _Item_ctx, "f").fillStyle = "#fff";
+            __classPrivateFieldGet(this, _Item_ctx, "f").fillText(`${this.amount()}`, position.x + 32 - 7, position.y + 32 - 1);
+        }
+    }
 }
-_Item_index = new WeakMap(), _Item_tile = new WeakMap(), _Item_itemtype = new WeakMap(), _Item_amount = new WeakMap();
+_Item_ctx = new WeakMap(), _Item_index = new WeakMap(), _Item_tile = new WeakMap(), _Item_itemtype = new WeakMap(), _Item_amount = new WeakMap();
 //# sourceMappingURL=item.js.map

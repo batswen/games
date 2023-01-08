@@ -6,9 +6,18 @@ export interface IVector {
 export class Vector {
     x: number
     y: number
-    constructor(arg: IVector) {
-        this.x = arg.x
-        this.y = arg.y
+
+    constructor(arg: IVector);
+    constructor(x: number, y: number);
+
+    constructor(...args: any[]) {
+        if (args.length === 1) {
+            this.x = args[0].x
+            this.y = args[0].y
+        } else {
+            this.x = args[0]
+            this.y = args[1]
+        }
     }
     static zero(): Vector {
         return new Vector({ x: 0, y: 0 })
@@ -25,21 +34,21 @@ export class Vector {
     }
     sub(arg: number | IVector) {
         if (arg instanceof Vector) {
-            this.x += arg.x
-            this.y += arg.y
+            this.x -= arg.x
+            this.y -= arg.y
         } else if (typeof arg === "number") {
-            this.x += arg
-            this.y += arg
+            this.x -= arg
+            this.y -= arg
         }
         return this
     }
     mult(arg: number | IVector) {
         if (arg instanceof Vector) {
-            this.x += arg.x
-            this.y += arg.y
+            this.x *= arg.x
+            this.y *= arg.y
         } else if (typeof arg === "number") {
-            this.x += arg
-            this.y += arg
+            this.x *= arg
+            this.y *= arg
         }
         return this
     }

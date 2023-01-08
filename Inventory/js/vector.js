@@ -1,7 +1,13 @@
 export class Vector {
-    constructor(arg) {
-        this.x = arg.x;
-        this.y = arg.y;
+    constructor(...args) {
+        if (args.length === 1) {
+            this.x = args[0].x;
+            this.y = args[0].y;
+        }
+        else {
+            this.x = args[0];
+            this.y = args[1];
+        }
     }
     static zero() {
         return new Vector({ x: 0, y: 0 });
@@ -19,23 +25,23 @@ export class Vector {
     }
     sub(arg) {
         if (arg instanceof Vector) {
-            this.x += arg.x;
-            this.y += arg.y;
+            this.x -= arg.x;
+            this.y -= arg.y;
         }
         else if (typeof arg === "number") {
-            this.x += arg;
-            this.y += arg;
+            this.x -= arg;
+            this.y -= arg;
         }
         return this;
     }
     mult(arg) {
         if (arg instanceof Vector) {
-            this.x += arg.x;
-            this.y += arg.y;
+            this.x *= arg.x;
+            this.y *= arg.y;
         }
         else if (typeof arg === "number") {
-            this.x += arg;
-            this.y += arg;
+            this.x *= arg;
+            this.y *= arg;
         }
         return this;
     }

@@ -11,15 +11,12 @@ const ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRendering
 if (ctx === null) {
     throw new Error("Kein Zeichenkontext")
 }
-const tileset = new Image()
-tileset.src = location.pathname + "img/tileset.png"
-// tileset.src = "../img/tileset.png"
 
-const size = new Vector({ x: 32, y: 32 })
+const size = new Vector(32, 32)
 const start_y = 50, delta_y = 33, gap_y = 3
 const start_x = 20, delta_x = 33
 
-const inventory = new Inventory(ctx, tileset, size)
+const inventory = new Inventory(ctx, size)
 inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y }), Itemtype.HELMET) // Head
 inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y }), Itemtype.WEAPON) // RArm
 inventory.addSlot(new Vector({ x: start_x + delta_x, y: start_y + delta_y }), Itemtype.PLATE) // Body
@@ -31,11 +28,11 @@ inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y * 4 + gap_y }), 
 inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y * 5 + gap_y }), Itemtype.ANY, 9, 1)
 inventory.addSlot(new Vector({ x: start_x, y: start_y + delta_y * 6 + gap_y }), Itemtype.ANY, 9, 1)
 
-inventory.set(6, new Item({ index: 0, amount: 1 }))
-inventory.add(new Item({ index: 1, amount: 1 }))
-inventory.add(new Item({ index: 1, amount: 1 }))
-inventory.set(0, new Item({ index: 3, amount: 1 }))
-inventory.add(new Item({ index: 2, amount: 7 }))
+inventory.set(6, new Item(ctx, { index: 0, amount: 1 }))
+inventory.add(new Item(ctx, { index: 1, amount: 1 }))
+inventory.add(new Item(ctx, { index: 1, amount: 1 }))
+inventory.set(0, new Item(ctx, { index: 3, amount: 1 }))
+inventory.add(new Item(ctx, { index: 2, amount: 7 }))
 
 const mouse = Vector.zero()
 
