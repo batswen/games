@@ -51,14 +51,14 @@ export class Inventory {
     #mouse_down_index: number   // contains inventory index
     #mouse_position: Vector     // x,y
     #mouse_delta: Vector        // x,y
-    #tile_index: number | undefined
+    #held_item: Item | null
     constructor(ctx: CanvasRenderingContext2D, tileset: HTMLImageElement, size: Vector) {
         this.#ctx = ctx
         this.#tileset = tileset
         this.#size = size
         this.#inventory = []
         this.#mouse_down_index = -1
-        this.#tile_index = -1
+        this.#held_item = null
         this.#mouse_position = new Vector({ x: 0, y: 0 })
         this.#mouse_delta = new Vector({ x: 0, y: 0 })
     }
@@ -124,42 +124,37 @@ export class Inventory {
     }
     update(mousebutton: string, mouse: Vector) {
         this.#mouse_position = mouse
-        if (mousebutton === MOUSE.DOWN && this.#mouse_down_index === -1) {
+        if (mousebutton === MOUSE.DOWN && this.#held_item === null) {
             const hover_index = this.pointInRect(this.#mouse_position)
             if (hover_index > -1) {
                 if (this.test(hover_index)) {
                     this.#mouse_down_index = hover_index
                     this.#mouse_delta = this.pointInRectDelta(this.#mouse_position)
-                    this.#tile_index = this.get(this.#mouse_down_index)?.tileIndex()
+                    this.#held_item = this.#inventory[this.#mouse_down_index].getItem()
+                    this.set(this.#mouse_down_index, null)
                 }
             }
         }
     
-        if (mousebutton === MOUSE.DOWN && this.#mouse_down_index !== -1) {
-        }
-    
-        if (mousebutton === MOUSE.UP && this.#mouse_down_index !== -1) {
+        if (mousebutton === MOUSE.UP && this.#held_item !== null) {
             const new_index = this.pointInRect(this.#mouse_position)
-            if (new_index > -1 && new_index !== this.#mouse_down_index) {
-                const old_item = this.get(this.#mouse_down_index)
-    
-                if (old_item && this.canDrop(new_index, old_item.itemtype())) {
+            if (new_index > -1) {
+                if (this.canDrop(new_index, this.#held_item.itemtype())) {
                     if (this.empty(new_index)) {
-                        // Move item
-                        this.set(new_index, old_item)
-                        this.set(this.#mouse_down_index, null)
+                        this.set(new_index, this.#held_item)
                     } else {
                         const item_to_swap = this.get(new_index)
-                        if (item_to_swap && this.canDrop(this.#mouse_down_index, item_to_swap.itemtype())) {
-                            // Swap if possible
-                            this.set(new_index, old_item)
+                        if (item_to_swap !== null && this.canDrop(this.#mouse_down_index, item_to_swap.itemtype())) {
+                            this.set(new_index, this.#held_item)
                             this.set(this.#mouse_down_index, item_to_swap)
+                        } else {
+                            this.set(this.#mouse_down_index, this.#held_item)
                         }
                     }
                 }
             }
             this.#mouse_down_index = -1
-            this.#tile_index = -1
+            this.#held_item = null
         }
     }
     draw() {
@@ -188,11 +183,11 @@ export class Inventory {
             }
         }
         // Draw dragged item
-        if (this.#tile_index !== undefined && this.#tile_index > -1) {
+        if (this.#held_item !== null) {
             this.#ctx.drawImage(
                 this.#tileset,
-                Math.floor(this.#tile_index % 64) * this.#size.x,
-                Math.floor(this.#tile_index / 64) * this.#size.y,
+                Math.floor(this.#held_item.tileIndex() % 64) * this.#size.x,
+                Math.floor(this.#held_item.tileIndex() / 64) * this.#size.y,
                 this.#size.x, this.#size.y,
                 this.#mouse_position.x - this.#mouse_delta.x,
                 // this.#mouse_position.x - this.#mouse_delta.x,
@@ -206,7 +201,7 @@ export class Inventory {
             const item = this.get(inv_index)!
             const x = this.#mouse_position.x, y = this.#mouse_position.y
             const text: Array<{ font: string, color: string, text: string }> = [
-                { font: "24px Pirata One", color: "#fff", text: "Qqg"+item.item().name },
+                { font: "24px Pirata One", color: "#fff", text: item.item().name },
                 { font: "16px Pirata One", color: "#4a4", text: item.itemtypeString() },
                 { font: "4", color: "", text: "" },
                 { font: "16px Pirata One", color: "#abf", text: `Damage: ${item.item().damage}` },
